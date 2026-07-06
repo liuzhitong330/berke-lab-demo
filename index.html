@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Striatal Dopamine Gradient — Cathy Liu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: Georgia, serif; max-width: 700px; margin: 0 auto;
+         padding: 2.5rem 1.5rem 4rem; line-height: 1.65; color: #222; background: #fff; }
+  h1, h2, h3 { font-family: -apple-system, system-ui, sans-serif; }
+  h1 { font-size: 1.45rem; margin-bottom: .2rem; }
+  .byline { font-family: system-ui, sans-serif; font-size: .85rem; color: #777; margin-bottom: 2rem; }
+  h2 { font-size: 1.1rem; margin-top: 2.5rem; border-bottom: 1px solid #eee; padding-bottom: .3rem; }
+  .note { background: #f6f6f4; border-left: 3px solid #999; padding: .8rem 1rem;
+          font-family: system-ui, sans-serif; font-size: .85rem; color: #444; margin: 1.2rem 0; }
+  .fig-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin: 1.2rem 0; }
+  .fig-row figure { flex: 1; min-width: 270px; margin: 0; }
+  .fig-row img { width: 100%; }
+  figcaption { font-family: system-ui, sans-serif; font-size: .78rem; color: #777; margin-top: .4rem; }
+  .code-wrap { overflow-x: auto; margin: 1rem 0; }
+  pre { white-space: pre; background: #f8f8f8; padding: 1rem; font-size: .8rem;
+        border-left: 3px solid #ddd; font-family: ui-monospace, Menlo, monospace; }
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; margin: 1rem 0;
+          font-family: system-ui, sans-serif; }
+  td, th { padding: .4rem .7rem; border-bottom: 1px solid #eee; text-align: left; }
+  th { font-weight: 600; color: #555; }
+  a { color: #2255aa; }
+  .meta { font-family: system-ui, sans-serif; font-size: .8rem; color: #888;
+          margin-top: 3rem; border-top: 1px solid #eee; padding-top: 1rem; }
+  .tag { display: inline-block; font-family: system-ui, sans-serif; font-size: .75rem;
+         background: #eef2f8; color: #2255aa; padding: .15rem .5rem;
+         border-radius: 3px; margin-right: .3rem; }
+</style>
+</head>
+<body>
+
+<h1>The Molecular Substrate of the Striatal Reward-Time Gradient</h1>
+<div class="byline">Cathy Liu · cathyliu014@gmail.com · personal exploratory project, July 2026</div>
+
+<span class="tag">dopamine</span>
+<span class="tag">striatum</span>
+<span class="tag">Allen Brain Atlas</span>
+<span class="tag">Python</span>
+
+<p style="margin-top:1.2rem">
+A recent finding from the
+<a href="https://berkelab.org" target="_blank">Berke lab</a>
+showed that dopamine transients in distinct striatal subregions convey reward prediction errors
+over distinct time horizons — more ventral regions (nucleus accumbens) signal immediate rewards,
+while more dorsal regions (caudoputamen) reflect longer time horizons. This is a compelling
+systems-level result. I got curious about what the molecular underpinning looks like:
+do the genes that define direct- and indirect-pathway MSNs show a corresponding
+gradient along the same dorsal–ventral axis?
+</p>
+
+<p>
+To check, I pulled <em>in situ</em> hybridization expression data from the
+<a href="https://mouse.brain-map.org/" target="_blank">Allen Mouse Brain Atlas</a>
+for ten dopamine pathway genes across three striatal subregions (caudoputamen → nucleus
+accumbens → olfactory tubercle), roughly tracing the dorsal-to-ventral axis.
+</p>
+
+<div class="note">
+<strong>What this is.</strong> A personal exploratory project, not novel research.
+All data is from the Allen Mouse Brain Atlas public API (Allen Institute for Brain Science, 2004).
+Expression values are ISH expression energy (sum of expressing pixels × intensity,
+normalized by annotation volume). Analysis is mine alone.
+</div>
+
+<h2>Data and approach</h2>
+
+<table>
+<tr><th>Source</th><th>What I pulled</th></tr>
+<tr>
+  <td><a href="https://mouse.brain-map.org/" target="_blank">Allen Mouse Brain Atlas</a></td>
+  <td>ISH expression energy for 10 dopamine pathway genes in 3 striatal structures
+      (CP, ACB, OT), via the public RMA API</td>
+</tr>
+</table>
+
+<p>The three structures, in dorsal-to-ventral order:</p>
+<ul>
+<li><strong>CP</strong> — Caudoputamen (dorsal striatum; sensorimotor + associative input)</li>
+<li><strong>ACB</strong> — Nucleus accumbens (ventral striatum; limbic/reward input)</li>
+<li><strong>OT</strong> — Olfactory tubercle (most ventral striatal territory; olfactory and reward)</li>
+</ul>
+
+<div class="code-wrap"><pre>
+import requests
+
+BASE = "http://api.brain-map.org/api/v2/data/query.json"
+
+# Get Allen structure IDs
+struct_ids = get_structure_ids(["CP", "ACB", "OT"])
+
+# For each gene, find the representative ISH dataset
+datasets = get_ish_datasets("Drd1")   # → [71307280, ...]
+
+# Pull expression energy per structure
+url = (f"{BASE}?criteria=model::StructureUnionize,"
+       f"rma::criteria,[section_data_set_id$eq{dataset_id}],"
+       f"[structure_id$in{id_str}]")
+expr = requests.get(url).json()["msg"]
+</pre></div>
+
+<h2>Results</h2>
+
+<div class="fig-row">
+  <figure>
+    <img src="heatmap.svg?v=1" alt="Heatmap of dopamine pathway gene expression across striatal subregions">
+    <figcaption>ISH expression energy (row-normalized) for 10 dopamine pathway genes
+    across three striatal subregions. Dorsal (CP) → Ventral (OT).
+    Raw expression energy values are annotated in each cell.</figcaption>
+  </figure>
+  <figure>
+    <img src="gradient.svg?v=1" alt="DRD1 vs DRD2 gradient and D1/D2 ratio across striatal subregions">
+    <figcaption>Left: absolute expression of D1R, D2R, dynorphin, and enkephalin along the
+    dorsal–ventral axis. Right: Drd1/Drd2 ratio — a proxy for direct/indirect pathway balance.
+    The ratio rises sharply in the olfactory tubercle, consistent with its limbic character.</figcaption>
+  </figure>
+</div>
+
+<h2>What the data shows</h2>
+
+<p>
+Several gradients are visible that fit the reward-gradient story:
+</p>
+<ul>
+<li><strong>Drd1 and Drd2 both decline ventrally</strong>, but Drd2 drops faster — so the
+Drd1/Drd2 ratio rises toward the olfactory tubercle (1.97 → 2.16 → 4.20).
+The olfactory tubercle, the most ventral striatal territory, is heavily biased toward
+D1-expressing direct-pathway MSNs. Electrophysiologically, this region responds most
+strongly to immediate reward — consistent with a D1-dominant motivational drive signal.</li>
+
+<li><strong>Adora2a (A2aR), an indirect-pathway co-marker</strong>, follows Drd2's profile
+closely — high in dorsal CP, dropping sharply ventrally — supporting the interpretation
+that indirect-pathway influence is proportionally greater in dorsal regions encoding
+longer time-horizon prediction errors.</li>
+
+<li><strong>Ppp1r1b (DARPP-32)</strong> is uniformly high in CP and ACB but drops in the
+olfactory tubercle, reflecting the latter's distinct MSN composition. Th (tyrosine hydroxylase)
+peaks in ACB — dopaminergic axons are densest there, consistent with nucleus accumbens
+being the canonical reward-prediction target.</li>
+</ul>
+
+<p>
+These molecular gradients don't <em>explain</em> the temporal gradient Berke's lab found at the
+systems level — that's an emergent circuit property — but they suggest the structural substrate
+is already encoded at the transcriptional level and could be interrogated in future
+single-cell or spatial transcriptomic experiments in the striatum.
+</p>
+
+<h2>Why this connects to the lab's work</h2>
+<ul>
+<li>The core question here — how to extract quantitative spatial patterns from large public atlas
+data — is directly related to computational approaches the Berke lab uses alongside
+its electrophysiology work. I want to bring that analytical perspective to the lab's datasets.</li>
+
+<li>My background is in both wet lab and computation: I've done animal behavior and
+circuit-level experiments, and I've built data pipelines for multi-modal neuroscience data.
+That combination is what I'd aim to contribute here.</li>
+
+<li>The analyses I find most compelling in the lab's recent papers are those that integrate
+multiple data modalities — e.g., pairing fast-scan voltammetry with spiking data to
+decompose the dopamine signal. I'm excited to work on that kind of integration problem.</li>
+</ul>
+
+<h2>Methods</h2>
+<p>
+Data retrieved July 2026. Allen Mouse Brain Atlas (Allen Institute for Brain Science),
+in situ hybridization data, mouse (P56), accessed via RMA API at
+<code>api.brain-map.org/api/v2/data/query.json</code>.
+Structures: CP (id 672), ACB (id 56), OT (id 754).
+Expression metric: <em>expression_energy</em> from StructureUnionize.
+One representative ISH dataset per gene (first result returned by API).
+Figures built with matplotlib. Code:
+<a href="fetch_atlas_data.py">fetch_atlas_data.py</a>,
+<a href="make_figures.py">make_figures.py</a>.
+Raw data: <a href="atlas_expression.tsv">atlas_expression.tsv</a>.
+</p>
+
+<div class="meta">
+Cathy Liu — cathyliu014@gmail.com | 415-216-3799<br>
+<a href="https://liuzhitong330.github.io/akassoglou-lab-demo/" target="_blank">Akassoglou Lab demo</a> ·
+<a href="https://liuzhitong330.github.io/baranzini-lab-demo/" target="_blank">Baranzini Lab demo</a> ·
+<a href="https://liuzhitong330.github.io/tvb-llm-robust-neurostim/" target="_blank">Epilepsy neurostimulation project</a>
+</div>
+
+</body>
+</html>

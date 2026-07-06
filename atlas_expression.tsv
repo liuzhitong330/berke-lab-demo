@@ -1,0 +1,31 @@
+gene	structure	structure_label	expression_energy
+Drd1	CP	Caudoputamen (dorsal striatum)	21.5144
+Drd1	ACB	Nucleus accumbens (ventral striatum)	20.559
+Drd1	OT	Olfactory tubercle (most ventral)	17.9814
+Drd2	CP	Caudoputamen (dorsal striatum)	10.9117
+Drd2	ACB	Nucleus accumbens (ventral striatum)	9.51139
+Drd2	OT	Olfactory tubercle (most ventral)	4.27651
+Drd3	CP	Caudoputamen (dorsal striatum)	0.0760193
+Drd3	ACB	Nucleus accumbens (ventral striatum)	0.301355
+Drd3	OT	Olfactory tubercle (most ventral)	0.112066
+Slc6a3	CP	Caudoputamen (dorsal striatum)	0.0719559
+Slc6a3	ACB	Nucleus accumbens (ventral striatum)	0.0482465
+Slc6a3	OT	Olfactory tubercle (most ventral)	0.0886064
+Slc18a2	CP	Caudoputamen (dorsal striatum)	0.122325
+Slc18a2	ACB	Nucleus accumbens (ventral striatum)	0.141609
+Slc18a2	OT	Olfactory tubercle (most ventral)	0.0390513
+Th	CP	Caudoputamen (dorsal striatum)	0.335981
+Th	ACB	Nucleus accumbens (ventral striatum)	0.929633
+Th	OT	Olfactory tubercle (most ventral)	0.114768
+Ppp1r1b	CP	Caudoputamen (dorsal striatum)	33.6789
+Ppp1r1b	ACB	Nucleus accumbens (ventral striatum)	31.1353
+Ppp1r1b	OT	Olfactory tubercle (most ventral)	10.7422
+Penk	CP	Caudoputamen (dorsal striatum)	23.0593
+Penk	ACB	Nucleus accumbens (ventral striatum)	18.8724
+Penk	OT	Olfactory tubercle (most ventral)	8.89394
+Pdyn	CP	Caudoputamen (dorsal striatum)	10.9843
+Pdyn	ACB	Nucleus accumbens (ventral striatum)	14.5385
+Pdyn	OT	Olfactory tubercle (most ventral)	7.2982
+Adora2a	CP	Caudoputamen (dorsal striatum)	11.5151
+Adora2a	ACB	Nucleus accumbens (ventral striatum)	4.19011
+Adora2a	OT	Olfactory tubercle (most ventral)	2.28454
